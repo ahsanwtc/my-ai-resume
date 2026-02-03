@@ -19,8 +19,6 @@
 
 	const { data }: { data: PageData } = $props();
 
-	console.log('Experiences:', data.experiences);
-
 	let chatOpen = $state<boolean>(false);
 	let chatMessages = $state<ChatMessage[]>([]);
 	let chatInput = $state<string>('');
