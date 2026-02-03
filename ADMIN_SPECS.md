@@ -1,0 +1,213 @@
+# Admin Panel Specifications
+
+## Overview
+Simple admin interface for managing portfolio content with Supabase authentication.
+
+## Authentication
+- **Provider**: Supabase Auth
+- **Method**: Email/Password (magic link optional)
+- **Protected Routes**: All `/admin/*` routes require authentication
+- **Session Management**: Server-side session validation
+
+## Routes Structure
+```
+/admin/login          - Login page
+/admin/dashboard      - Overview/home
+/admin/profile        - Edit profile information
+/admin/experiences    - Manage experiences (CRUD + reorder)
+/admin/skills         - Manage skills (CRUD + reorder)
+/admin/faq            - Manage FAQ responses
+```
+
+## Design System
+- **Reuse existing design**: Same colors, typography, components
+- **Layout**: Simple sidebar navigation + main content area
+- **Forms**: Clean, minimal styling matching main site
+- **Feedback**: Toast notifications for success/error states
+
+## Features by Section
+
+### 1. Login Page (`/admin/login`)
+- Email input
+- Password input
+- "Sign In" button
+- Error message display
+- Redirect to dashboard on success
+
+### 2. Dashboard (`/admin/dashboard`)
+- Quick stats (# experiences, # skills, last updated)
+- Quick links to edit sections
+- Logout button
+
+### 3. Profile Editor (`/admin/profile`)
+**Fields:**
+- Name (text)
+- Short Name (text)
+- Tagline (text)
+- Title (text)
+- Subtitle (text)
+- Target Titles (array - add/remove text inputs)
+- Target Company Stages (array - add/remove text inputs)
+- Location (text)
+- Remote Preference (text)
+- GitHub URL (text)
+- LinkedIn URL (text)
+- Twitter URL (text)
+
+**Actions:**
+- Save button
+- Cancel button
+
+### 4. Experiences Manager (`/admin/experiences`)
+**List View:**
+- Display all experiences in order
+- Drag handle for reordering
+- Edit button
+- Delete button (with confirmation)
+- "Add New Experience" button
+
+**Edit/Create Form:**
+- Company Name (text)
+- Title (text)
+- Title Progression (text, optional)
+- Team (text, optional)
+- Start Date (date picker)
+- End Date (date picker, optional)
+- Is Current (checkbox)
+- Bullet Points (array - add/remove textareas)
+- Display Order (number, auto-managed by drag-drop)
+
+**AI Context Fields (not public):**
+- Why Joined (textarea)
+- Why Left (textarea)
+- Actual Contributions (textarea)
+- Proudest Achievement (textarea)
+- Would Do Differently (textarea)
+- Challenges Faced (textarea)
+- Lessons Learned (textarea)
+- Manager Would Say (textarea)
+- Reports Would Say (textarea)
+
+**Actions:**
+- Save
+- Cancel
+- Delete
+
+### 5. Skills Manager (`/admin/skills`)
+**List View:**
+- Three columns: Strong / Moderate / Gaps
+- Drag-drop between columns to change category
+- Drag-drop within column to reorder
+- Edit button
+- Delete button
+- "Add New Skill" button
+
+**Edit/Create Form:**
+- Skill Name (text)
+- Category (dropdown: strong/moderate/gap)
+- Display Order (auto-managed)
+
+**Actions:**
+- Save
+- Cancel
+- Delete
+
+### 6. FAQ Manager (`/admin/faq`)
+**List View:**
+- Display all FAQ items
+- Edit button
+- Delete button
+- "Add New FAQ" button
+
+**Edit/Create Form:**
+- Question (text)
+- Answer (textarea)
+
+**Actions:**
+- Save
+- Cancel
+- Delete
+
+## Technical Implementation
+
+### Authentication Flow
+1. User visits `/admin/*` route
+2. Server checks for valid session
+3. If no session → redirect to `/admin/login`
+4. If valid session → allow access
+
+### Data Operations
+- **Create**: POST to API route → Insert to Supabase
+- **Read**: Server load function → Fetch from Supabase
+- **Update**: PUT to API route → Update in Supabase
+- **Delete**: DELETE to API route → Delete from Supabase
+- **Reorder**: PATCH to API route → Update display_order fields
+
+### Drag & Drop
+- **Library**: Native HTML5 drag-drop or simple library (svelte-dnd-action)
+- **Behavior**: Visual feedback during drag, update order on drop
+- **Persistence**: Save new order to database immediately
+
+### Form Validation
+- Required fields marked with *
+- Client-side validation before submit
+- Server-side validation in API routes
+- Display errors inline
+
+### Array Fields (Bullet Points, Target Titles, etc.)
+- Display as list of inputs/textareas
+- "Add" button to append new field
+- "Remove" button (X icon) next to each field
+- Minimum 1 item (can't remove last one)
+
+## API Routes Structure
+```
+/api/admin/profile          - GET, PUT
+/api/admin/experiences      - GET, POST
+/api/admin/experiences/[id] - GET, PUT, DELETE
+/api/admin/experiences/reorder - PATCH
+/api/admin/skills           - GET, POST
+/api/admin/skills/[id]      - GET, PUT, DELETE
+/api/admin/skills/reorder   - PATCH
+/api/admin/faq              - GET, POST
+/api/admin/faq/[id]         - GET, PUT, DELETE
+```
+
+## Security
+- All admin routes require authentication
+- Service role key used server-side only
+- CSRF protection via SvelteKit
+- Input sanitization on all forms
+- SQL injection prevention (Supabase handles this)
+
+## UI Components Needed
+1. **Sidebar Navigation** - Links to all admin sections
+2. **Form Input** - Reusable text input component
+3. **Form Textarea** - Reusable textarea component
+4. **Array Field Manager** - Add/remove dynamic fields
+5. **Drag Handle** - Visual indicator for draggable items
+6. **Delete Confirmation Modal** - Confirm before delete
+7. **Toast Notification** - Success/error messages
+8. **Loading Spinner** - For async operations
+
+## Implementation Order
+1. Set up Supabase auth (hooks, types)
+2. Create login page
+3. Create admin layout with sidebar
+4. Create dashboard
+5. Create profile editor
+6. Create experiences manager (CRUD)
+7. Add drag-drop to experiences
+8. Create skills manager (CRUD)
+9. Add drag-drop to skills
+10. Create FAQ manager (CRUD)
+11. Polish UI and add loading states
+12. Test all CRUD operations
+13. Test drag-drop reordering
+
+## Notes
+- Keep it simple - no fancy UI libraries
+- Focus on functionality over aesthetics
+- Reuse existing design tokens
+- Mobile-friendly but desktop-first
+- No need for image uploads (yet)
