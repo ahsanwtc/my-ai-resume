@@ -196,7 +196,7 @@ Simple admin interface for managing portfolio content with Supabase authenticati
 3. ✅ Create admin layout with sidebar
 4. ✅ Create dashboard
 5. ✅ Create profile editor
-6. ⏳ Create experiences manager (CRUD)
+6. ✅ Create experiences manager (CRUD)
 7. ⏳ Add drag-drop to experiences
 8. ⏳ Create skills manager (CRUD)
 9. ⏳ Add drag-drop to skills
@@ -237,6 +237,45 @@ Simple admin interface for managing portfolio content with Supabase authenticati
 - ✅ Proper TypeScript typing throughout
 - ✅ Form state preservation after submit
 
+### Experiences Manager
+- ✅ List view with all experiences
+- ✅ Add new experience
+- ✅ Edit existing experience
+- ✅ Delete with confirmation modal (reusable component)
+- ✅ Dynamic bullet points (add/remove textareas)
+- ✅ Date fields (start/end with "current" checkbox)
+- ✅ Title progression field
+- ✅ Team field
+- ✅ Display order field
+- ✅ Form validation
+- ✅ Success/error messages
+- ✅ Drag handles (UI ready, functionality pending)
+
+## Reusable Components
+
+### DeleteConfirmModal
+Location: `$lib/components/DeleteConfirmModal.svelte`
+
+Props:
+- `show: boolean` - Show/hide modal
+- `title: string` - Modal title
+- `message: string` - Confirmation message
+- `onConfirm: () => void` - Callback on confirm
+- `onCancel: () => void` - Callback on cancel
+- `confirmText?: string` - Confirm button text (default: "Yes, Delete")
+- `cancelText?: string` - Cancel button text (default: "Cancel")
+
+Usage:
+```svelte
+<DeleteConfirmModal
+  show={showModal}
+  title="Delete Item?"
+  message="Are you sure?"
+  onConfirm={handleDelete}
+  onCancel={() => showModal = false}
+/>
+```
+
 ## Technical Implementation Details
 
 ### File Structure
@@ -244,6 +283,9 @@ Simple admin interface for managing portfolio content with Supabase authenticati
 src/
 ├── hooks.server.ts (Supabase auth setup)
 ├── app.d.ts (Locals types for Supabase)
+├── lib/
+│   └── components/
+│       └── DeleteConfirmModal.svelte (reusable)
 └── routes/
     ├── admin/
     │   ├── +layout.svelte (sidebar navigation)
@@ -256,9 +298,15 @@ src/
     │   ├── dashboard/
     │   │   ├── +page.svelte
     │   │   └── +page.server.ts (fetch stats)
-    │   └── profile/
-    │       ├── +page.svelte (form UI)
-    │       └── +page.server.ts (load + update)
+    │   ├── profile/
+    │   │   ├── +page.svelte (form UI)
+    │   │   └── +page.server.ts (load + update)
+    │   └── experiences/
+    │       ├── +page.svelte (list view)
+    │       ├── +page.server.ts (load + delete action)
+    │       └── [id]/
+    │           ├── +page.svelte (edit/create form)
+    │           └── +page.server.ts (load + save/delete actions)
     └── auth/
         └── callback/
             └── +server.ts (handle magic link)
