@@ -34,6 +34,7 @@ export const actions: Actions = {
 			start_date: formData.get('start_date') as string,
 			end_date: formData.get('is_current') === 'on' ? null : (formData.get('end_date') as string),
 			is_current: formData.get('is_current') === 'on',
+			on_hero_section: formData.get('on_hero_section') === 'on',
 			bullet_points: bulletPoints,
 			display_order: parseInt(formData.get('display_order') as string) || 0
 		};

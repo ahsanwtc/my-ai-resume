@@ -144,6 +144,19 @@
 				</label>
 			</div>
 
+			<div class="flex items-center gap-2">
+				<input
+					id="on_hero_section"
+					name="on_hero_section"
+					type="checkbox"
+					checked={data.experience?.on_hero_section || false}
+					class="w-4 h-4 bg-white/5 border border-white/10 rounded"
+				/>
+				<label for="on_hero_section" class="text-sm text-gray-300">
+					Show on hero section
+				</label>
+			</div>
+
 			<div>
 				<label for="display_order" class="block text-sm font-medium text-gray-300 mb-2">
 					Display Order

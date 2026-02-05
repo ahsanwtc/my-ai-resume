@@ -118,7 +118,7 @@
 
 		<!-- Company Badges -->
 		<div class="flex flex-wrap gap-3 mb-10">
-			{#each companies as company, index (index)}
+			{#each data.companies as company, index (index)}
 				<span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 transition-colors">
 					{company}
 				</span>

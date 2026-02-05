@@ -19,7 +19,10 @@ export const load: PageServerLoad = async (): Promise<PageData> => {
 		supabase.from('resume_experiences').select('*').order('display_order').returns<ResumeExperience[]>(),
 		supabase.from('resume_skills').select('*').returns<ResumeSkill[]>(),
 		supabase.from('resume_faq_responses').select('*').returns<ResumeFaqResponse[]>()
-	]);
+  ]);
+
+  const companies = new Set<string>();
+
 
 	// Public data for rendering
 	const publicData: PageData = {
@@ -42,20 +45,28 @@ export const load: PageServerLoad = async (): Promise<PageData> => {
 
 		experiences:
 			experiencesRes.data
-				?.map((exp) => ({
-					id: exp.id,
-					name: exp.company_name,
-					title: exp.title,
-					titleProgression: exp.title_progression,
-					team: exp.team,
-					startDate: exp.start_date,
-					endDate: exp.end_date,
-					isCurrent: exp.is_current,
-					bulletPoints: exp.bullet_points || [],
-					bullets: exp.bullet_points || [],
-					order: exp.display_order
-				}))
+        ?.map((exp) => {
+          if (exp.on_hero_section) {
+            companies.add(exp.company_name);
+          }
+          return {
+            id: exp.id,
+            name: exp.company_name,
+            title: exp.title,
+            titleProgression: exp.title_progression,
+            team: exp.team,
+            startDate: exp.start_date,
+            endDate: exp.end_date,
+            isCurrent: exp.is_current,
+            bulletPoints: exp.bullet_points || [],
+            bullets: exp.bullet_points || [],
+            order: exp.display_order,
+            onHeroSection: exp.on_hero_section,
+          };
+				})
 				.sort((a, b) => a.order - b.order) || [],
+
+			companies: [...companies],
 
 		skills: {
 			strong: skillsRes.data?.filter((s) => s.category === 'strong').map((s) => s.name) || [],

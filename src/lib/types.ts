@@ -29,7 +29,8 @@ export interface ResumeExperience {
 	end_date?: string;
 	is_current: boolean;
 	bullet_points: string[];
-	display_order: number;
+  display_order: number;
+	on_hero_section: boolean;
 }
 
 export interface ResumeSkill {
@@ -95,7 +96,8 @@ export interface Experience {
 	isCurrent: boolean;
 	bulletPoints: string[];
 	bullets: string[];
-	order: number;
+  order: number;
+  onHeroSection: boolean;
 }
 
 export interface SkillsMatrix {
@@ -105,7 +107,8 @@ export interface SkillsMatrix {
 }
 
 export interface PageData {
-	profile: Profile | null;
+  profile: Profile | null;
+  companies: Array<string>;
 	experiences: Experience[];
 	skills: SkillsMatrix;
 	commonQuestions: string[];
