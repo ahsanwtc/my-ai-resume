@@ -51,6 +51,8 @@ export interface ResumeFaqResponse {
 	created_at: string;
 	question: string;
 	answer: string;
+	is_common_question: boolean;
+	display_order: number;
 }
 
 export interface ResumeWeakness {

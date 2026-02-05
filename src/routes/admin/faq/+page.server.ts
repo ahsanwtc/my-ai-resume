@@ -1,36 +1,35 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_SECRET_KEY } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { fail } from '@sveltejs/kit';
+import { SUPABASE_SECRET_KEY } from '$env/static/private';
+import type { ResumeFaqResponse } from '$lib/types';
 import type { Actions, PageServerLoad } from './$types';
-import type { ResumeSkill } from '$lib/types';
+import { fail } from '@sveltejs/kit';
 
 const supabase = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY);
 
 export const load: PageServerLoad = async () => {
-	const { data } = await supabase
-		.from('resume_skills')
+	const { data: faqs } = await supabase
+		.from('resume_faq_responses')
 		.select('*')
-		.order('display_order')
-		.returns<ResumeSkill[]>();
+		.order('display_order', { ascending: true })
+		.returns<ResumeFaqResponse[]>();
 
 	return {
-		skills: {
-			strong: data?.filter(s => s.category === 'strong') || [],
-			moderate: data?.filter(s => s.category === 'moderate') || [],
-			gap: data?.filter(s => s.category === 'gap') || []
-		}
+		faqs: faqs || []
 	};
 };
 
 export const actions: Actions = {
 	delete: async ({ request }) => {
 		const formData = await request.formData();
-		const id = formData.get('id');
+		const id = formData.get('id') as string;
 
-		const { error } = await supabase.from('resume_skills').delete().eq('id', id);
+		const { error } = await supabase.from('resume_faq_responses').delete().eq('id', id);
 
-		if (error) return fail(500, { message: error.message });
+		if (error) {
+			return fail(500, { message: error.message });
+		}
+
 		return { success: true };
 	},
 
@@ -40,7 +39,7 @@ export const actions: Actions = {
 
 		for (const update of updates) {
 			await supabase
-				.from('resume_skills')
+				.from('resume_faq_responses')
 				.update({ display_order: update.display_order })
 				.eq('id', update.id);
 		}

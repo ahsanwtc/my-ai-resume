@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import DeleteConfirmModal from '$lib/components/DeleteConfirmModal.svelte';
+	import DraggableList from '$lib/components/DraggableList.svelte';
 	import type { PageData } from './$types';
 	import type { ResumeSkill } from '$lib/types';
 
@@ -9,8 +10,6 @@
 
 	let activeTab = $state<'strong' | 'moderate' | 'gap'>('strong');
 	let deleteId = $state<string | null>(null);
-	let draggedItem = $state<ResumeSkill | null>(null);
-	let dragOverIndex = $state<number | null>(null);
 
 	const tabs = [
 		{ key: 'strong' as const, label: 'Strong', icon: '✓', color: 'accent-teal' },
@@ -33,46 +32,7 @@
 		deleteId = null;
 	}
 
-	function handleDragStart(e: DragEvent, skill: ResumeSkill): void {
-		draggedItem = skill;
-		if (e.dataTransfer) {
-			e.dataTransfer.effectAllowed = 'move';
-		}
-	}
-
-	function handleDragOver(e: DragEvent, index: number): void {
-		e.preventDefault();
-		dragOverIndex = index;
-	}
-
-	function handleDragLeave(): void {
-		dragOverIndex = null;
-	}
-
-	async function handleDrop(e: DragEvent, targetIndex: number): Promise<void> {
-		e.preventDefault();
-		if (!draggedItem) return;
-
-		const skills = data.skills[activeTab];
-		const draggedIndex = skills.findIndex(s => s.id === draggedItem?.id);
-
-		if (draggedIndex === targetIndex) {
-			draggedItem = null;
-			dragOverIndex = null;
-			return;
-		}
-
-		// Reorder array
-		const newSkills = [...skills];
-		newSkills.splice(draggedIndex, 1);
-		newSkills.splice(targetIndex, 0, draggedItem);
-
-		// Update display_order for all affected items
-		const updates = newSkills.map((skill, index) => ({
-			id: skill.id,
-			order: index
-		}));
-
+	async function handleReorder(updates: { id: string; display_order: number }[]): Promise<void> {
 		const formData = new FormData();
 		formData.append('updates', JSON.stringify(updates));
 
@@ -81,9 +41,7 @@
 			body: formData
 		});
 
-		goto(resolve('/admin/skills'), { invalidateAll: true });
-		draggedItem = null;
-		dragOverIndex = null;
+		await invalidateAll();
 	}
 </script>
 
@@ -131,25 +89,15 @@
 			</a>
 		</div>
 	{:else}
-		<div class="space-y-3">
-			{#each data.skills[activeTab] as skill, index (skill.id)}
-				{#if dragOverIndex === index && draggedItem && draggedItem.id !== skill.id}
-					<div class="h-1 bg-accent-teal rounded-full"></div>
-				{/if}
-				<div
-					role="button"
-					tabindex="0"
-					draggable="true"
-					ondragstart={(e) => handleDragStart(e, skill)}
-					ondragover={(e) => handleDragOver(e, index)}
-					ondragleave={handleDragLeave}
-					ondrop={(e) => handleDrop(e, index)}
-					class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 cursor-move hover:bg-white/[0.07] transition-all {draggedItem?.id === skill.id ? 'opacity-50' : ''}"
-				>
+		<DraggableList items={data.skills[activeTab]} onReorder={handleReorder}>
+			{#snippet itemContent(skill: ResumeSkill)}
+				<div class="flex items-center gap-4">
 					<!-- Drag Handle -->
 					<div class="text-gray-500">
 						<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-							<path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"/>
+							<path
+								d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"
+							/>
 						</svg>
 					</div>
 
@@ -164,7 +112,7 @@
 					<!-- Rating -->
 					{#if skill.self_rating}
 						<div class="flex gap-1">
-							{#each Array(5), i (i)}
+							{#each Array(5) as _, i (i)}
 								<span class="text-lg {i < skill.self_rating ? 'text-accent-teal' : 'text-gray-600'}">
 									★
 								</span>
@@ -189,8 +137,8 @@
 						</button>
 					</div>
 				</div>
-			{/each}
-		</div>
+			{/snippet}
+		</DraggableList>
 	{/if}
 </div>
 
