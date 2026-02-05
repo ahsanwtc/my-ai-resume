@@ -133,6 +133,9 @@
 	{:else}
 		<div class="space-y-3">
 			{#each data.skills[activeTab] as skill, index (skill.id)}
+				{#if dragOverIndex === index && draggedItem && draggedItem.id !== skill.id}
+					<div class="h-1 bg-accent-teal rounded-full"></div>
+				{/if}
 				<div
 					role="button"
 					tabindex="0"
@@ -141,7 +144,7 @@
 					ondragover={(e) => handleDragOver(e, index)}
 					ondragleave={handleDragLeave}
 					ondrop={(e) => handleDrop(e, index)}
-					class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 cursor-move hover:bg-white/[0.07] transition-all {dragOverIndex === index ? 'border-accent-teal' : ''}"
+					class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 cursor-move hover:bg-white/[0.07] transition-all {draggedItem?.id === skill.id ? 'opacity-50' : ''}"
 				>
 					<!-- Drag Handle -->
 					<div class="text-gray-500">
