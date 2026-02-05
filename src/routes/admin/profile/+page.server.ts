@@ -4,22 +4,24 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import type { ResumeProfile } from '$lib/types';
+const supabase = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY);
 
 export const load: PageServerLoad = async () => {
-	const supabase = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY);
 	const { data } = await supabase.from('resume_profile').select('*').single<ResumeProfile>();
 	return { profile: data };
 };
 
 export const actions: Actions = {
 	default: async ({ request }) => {
-		const supabase = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY);
 		const formData = await request.formData();
-
 		const targetTitles = formData.getAll('target_titles').filter((t) => t) as string[];
 		const targetCompanyStages = formData.getAll('target_company_stages').filter((s) => s) as string[];
+    const { data } = await supabase.from('resume_profile').select('*').single<ResumeProfile>();
 
-		const profileId = "1";
+    const profileId = data?.id;
+    if (data === null) {
+      return fail(500, { message: "profile not found" });
+    }
 
 		const updateData = {
 			name: formData.get('name') as string,

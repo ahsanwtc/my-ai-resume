@@ -190,6 +190,28 @@ Simple admin interface for managing portfolio content with Supabase authenticati
 7. **Toast Notification** - Success/error messages
 8. **Loading Spinner** - For async operations
 
+## Code Quality Standards
+
+### TypeScript
+- ✅ **No explicit `any` types** - Always use proper types
+- ✅ **Import types from `$lib/types`** for database models
+- ✅ **Use Svelte 5 types**: `Snippet` for children, `$derived` for computed values
+- ✅ **Type all function parameters and return types**
+- ✅ **Use type-safe navigation** with `resolve()` from `$app/paths`
+
+### Svelte 5 Patterns
+- ✅ Use `$state` for reactive variables
+- ✅ Use `$derived` for computed values (not capturing initial data)
+- ✅ Use `$effect` for side effects
+- ✅ Use `$props()` for component props
+- ✅ Type children as `Snippet`
+
+### Form Handling
+- ✅ Use `enhance` from `$app/forms` for progressive enhancement
+- ✅ Set `reset: false` in enhance callback to preserve form state
+- ✅ Use FormData for POST requests
+- ✅ Handle loading states with `$state`
+
 ## Implementation Order
 1. ✅ Set up Supabase auth (hooks, types)
 2. ✅ Create login page (magic link)

@@ -20,7 +20,6 @@ export interface ResumeProfile {
 
 export interface ResumeExperience {
 	id: string;
-	profile_id: string;
 	created_at: string;
 	company_name: string;
 	title: string;
@@ -35,15 +34,20 @@ export interface ResumeExperience {
 
 export interface ResumeSkill {
 	id: string;
-	profile_id: string;
 	created_at: string;
 	name: string;
 	category: 'strong' | 'moderate' | 'gap';
+	self_rating?: number;
+	evidence?: string;
+	honest_notes?: string;
+	years_experience?: number;
+	in_use: boolean;
+	last_used?: string;
+	display_order: number;
 }
 
 export interface ResumeFaqResponse {
 	id: string;
-	profile_id: string;
 	created_at: string;
 	question: string;
 	answer: string;
@@ -51,14 +55,12 @@ export interface ResumeFaqResponse {
 
 export interface ResumeWeakness {
 	id: string;
-	profile_id: string;
 	created_at: string;
 	description: string;
 }
 
 export interface ResumeValuesCulture {
 	id: string;
-	profile_id: string;
 	created_at: string;
 	must_haves?: string;
 	dealbreakers?: string;
